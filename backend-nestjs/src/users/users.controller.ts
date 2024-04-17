@@ -21,18 +21,14 @@ export class UsersController {
   async findAll(): Promise<Result<User[]>> {
     try {
       const data = await this.userService.findAll();
+      console.log('check data:', data);
 
-      if (data.EC !== 0) {
-        throw new HttpException(data.EM, HttpStatus.NOT_FOUND);
+      if (data.EC == -1) {
+        return new Result(data.EC, data.DT, data.EM);
       }
       return data;
     } catch (error) {
       console.log(error);
-
-      throw new HttpException(
-        'Failed to retrieve users',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
     }
   }
 
@@ -41,17 +37,13 @@ export class UsersController {
   async createNewUser(@Body() userData: Partial<User>): Promise<Result<void>> {
     try {
       const data = await this.userService.createUser(userData);
-      if (data.EC !== 0) {
-        throw new HttpException(data.EM, HttpStatus.NOT_FOUND);
+      if (data.EC === -1) {
+        return new Result(data.EC, data.DT, data.EM);
       }
 
       return data;
     } catch (error) {
       console.log(error);
-      throw new HttpException(
-        'Failed to retrieve users',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
     }
   }
 
@@ -61,15 +53,11 @@ export class UsersController {
     try {
       const data = await this.userService.findOneById(id);
       if (!data) {
-        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+        return new Result(data.EC, data.DT, data.EM);
       }
       return data;
     } catch (error) {
       console.log(error);
-      throw new HttpException(
-        'Failed to retrieve user',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
     }
   }
 
@@ -81,16 +69,12 @@ export class UsersController {
   ): Promise<Result<void>> {
     try {
       const data = await this.userService.updateUserById(id, updateData);
-      if (data.EC !== 0) {
-        throw new HttpException(data.EM, HttpStatus.NOT_FOUND);
+      if (data.EC === -1) {
+        return new Result(data.EC, data.DT, data.EM);
       }
       return data;
     } catch (error) {
       console.log(error);
-      throw new HttpException(
-        'Failed to retrieve users',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
     }
   }
 
@@ -99,16 +83,12 @@ export class UsersController {
   async deleteTheUser(@Param('id') id: number): Promise<Result<void>> {
     try {
       const data = await this.userService.deleteUser(id);
-      if (data.EC !== 0) {
-        throw new HttpException(data.EM, HttpStatus.NOT_FOUND);
+      if (data.EC === -1) {
+        return new Result(data.EC, data.DT, data.EM);
       }
       return data;
     } catch (error) {
       console.log(error);
-      throw new HttpException(
-        'Failed to retrieve users',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
     }
   }
 }
