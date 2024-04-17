@@ -9,35 +9,59 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
-import { Result } from 'src/common/result.model';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  // register
+  // Register
   @Post('register')
   async register(
     @Body('email') email: string,
     @Body('password') password: string,
     @Body('confirmPassword') confirmPassword: string,
+    @Body('name') name: string,
   ): Promise<any> {
-    if (password.trim() !== confirmPassword.trim()) {
-      throw new HttpException('Passwords do not match', HttpStatus.BAD_REQUEST);
-    }
+    try {
+      if (password.trim() !== confirmPassword.trim()) {
+        throw new HttpException(
+          'Passwords do not match',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
 
-    const data = await this.authService.registerUser(email, password);
-    return new Result(data.EC, data.DT, data.EM);
+      const result = await this.authService.registerUser(email, password, name);
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: result.message,
+      };
+    } catch (error) {
+      throw new HttpException(
+        error.response || 'Registration failed',
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
-  // login
+
+  // Login
   @UseGuards(AuthGuard('local'))
   @Post('login')
   async login(@Request() req) {
     try {
-      return req.user;
+      if (!req.user) {
+        throw new HttpException(
+          'User not authenticated',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Login successful',
+        user: req.user,
+      };
     } catch (error) {
       throw new HttpException(
-        error.message || 'Login failed',
+        error.response || 'Login failed',
         error.status || HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

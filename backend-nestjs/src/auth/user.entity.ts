@@ -5,10 +5,10 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: true })
+  @Column()
   name: string;
 
-  @Column({ unique: true })
+  @Column()
   email: string;
 
   @Column()

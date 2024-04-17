@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
-import { Result } from 'src/common/result.model';
 
 @Controller('users')
 export class UsersController {
@@ -18,46 +17,54 @@ export class UsersController {
 
   // Read all users
   @Get()
-  async findAll(): Promise<Result<User[]>> {
+  async findAll() {
     try {
-      const data = await this.userService.findAll();
-      console.log('check data:', data);
-
-      if (data.EC == -1) {
-        return new Result(data.EC, data.DT, data.EM);
-      }
-      return data;
+      const result = await this.userService.findAll();
+      return {
+        statusCode: HttpStatus.OK,
+        data: result.users,
+        message: result.message,
+      };
     } catch (error) {
-      console.log(error);
+      throw new HttpException(
+        error.message || 'Internal server error',
+        error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
-  // create
+  // Create new user
   @Post()
-  async createNewUser(@Body() userData: Partial<User>): Promise<Result<void>> {
+  async createNewUser(@Body() userData: Partial<User>) {
     try {
-      const data = await this.userService.createUser(userData);
-      if (data.EC === -1) {
-        return new Result(data.EC, data.DT, data.EM);
-      }
-
-      return data;
+      const result = await this.userService.createUser(userData);
+      return {
+        statusCode: result.statusCode,
+        message: result.message,
+      };
     } catch (error) {
-      console.log(error);
+      throw new HttpException(
+        error.message || 'Internal server error',
+        error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   // Read one user by ID
   @Get(':id')
-  async findOne(@Param('id') id: number): Promise<Result<User[]>> {
+  async findOne(@Param('id') id: number) {
     try {
-      const data = await this.userService.findOneById(id);
-      if (!data) {
-        return new Result(data.EC, data.DT, data.EM);
-      }
-      return data;
+      const result = await this.userService.findOneById(id);
+      return {
+        statusCode: HttpStatus.OK,
+        user: result.user,
+        message: result.message,
+      };
     } catch (error) {
-      console.log(error);
+      throw new HttpException(
+        error.message || 'No user found',
+        error.statusCode || HttpStatus.NOT_FOUND,
+      );
     }
   }
 
@@ -66,29 +73,35 @@ export class UsersController {
   async updateUserById(
     @Param('id') id: number,
     @Body() updateData: Partial<User>,
-  ): Promise<Result<void>> {
+  ) {
     try {
-      const data = await this.userService.updateUserById(id, updateData);
-      if (data.EC === -1) {
-        return new Result(data.EC, data.DT, data.EM);
-      }
-      return data;
+      const result = await this.userService.updateUserById(id, updateData);
+      return {
+        statusCode: result.statusCode,
+        message: result.message,
+      };
     } catch (error) {
-      console.log(error);
+      throw new HttpException(
+        error.message || 'User not found',
+        error.statusCode || HttpStatus.NOT_FOUND,
+      );
     }
   }
 
-  // delete user
+  // Delete user
   @Delete(':id')
-  async deleteTheUser(@Param('id') id: number): Promise<Result<void>> {
+  async deleteTheUser(@Param('id') id: number) {
     try {
-      const data = await this.userService.deleteUser(id);
-      if (data.EC === -1) {
-        return new Result(data.EC, data.DT, data.EM);
-      }
-      return data;
+      const result = await this.userService.deleteUser(id);
+      return {
+        statusCode: result.statusCode,
+        message: result.message,
+      };
     } catch (error) {
-      console.log(error);
+      throw new HttpException(
+        error.message || 'User not found',
+        error.statusCode || HttpStatus.NOT_FOUND,
+      );
     }
   }
 }

@@ -2,7 +2,6 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
-import { Result } from 'src/common/result.model';
 
 @Injectable()
 export class UsersService {
@@ -12,15 +11,24 @@ export class UsersService {
   ) {}
 
   // read
-  async findAll(): Promise<Result<User[]>> {
+  async findAll(): Promise<{
+    statusCode: number;
+    users: User[];
+    message: string;
+  }> {
     try {
-      const data = await this.userRepository.find();
+      const users = await this.userRepository.find();
+      console.log('check data', users);
 
-      if (data.length === 0) {
-        return new Result(-1, null, 'No users found');
+      if (users.length === 0) {
+        throw new HttpException('No users found', HttpStatus.NOT_FOUND);
       }
 
-      return new Result(0, data, 'successfully!');
+      return {
+        statusCode: HttpStatus.OK,
+        users,
+        message: 'Successfully retrieved users.',
+      };
     } catch (error) {
       console.error('Find All Users Error:', error);
       throw new HttpException(
@@ -31,15 +39,21 @@ export class UsersService {
   }
 
   // read with id
-  async findOneById(id: number): Promise<Result<User[]>> {
+  async findOneById(
+    id: number,
+  ): Promise<{ statusCode: number; user: User; message: string }> {
     try {
-      const data = await this.userRepository.findOneBy({ id });
-
-      if (!data) {
-        return new Result(-1, null, 'No users found');
+      const user = await this.userRepository.findOneBy({ id });
+      if (!user) {
+        throw new HttpException('No user found', HttpStatus.NOT_FOUND);
       }
-      return new Result(0, [data], 'successfully!');
+      return {
+        statusCode: HttpStatus.OK,
+        user,
+        message: 'Successfully retrieved user.',
+      };
     } catch (error) {
+      console.error('Find One User Error:', error);
       throw new HttpException(
         'Internal server error',
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -51,16 +65,18 @@ export class UsersService {
   async updateUserById(
     id: number,
     updateData: Partial<User>,
-  ): Promise<Result<void>> {
+  ): Promise<{ statusCode: number; message: string }> {
     try {
-      const data = await this.userRepository.update(id, updateData);
-
-      if (data.affected === 0) {
-        return new Result(-1, null, 'User not found');
+      const result = await this.userRepository.update(id, updateData);
+      if (result.affected === 0) {
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
       }
-      return new Result(0, null, 'Update successful');
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'User updated successfully.',
+      };
     } catch (error) {
-      console.error(error);
+      console.error('Update User Error:', error);
       throw new HttpException(
         'Internal server error',
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -69,14 +85,18 @@ export class UsersService {
   }
 
   // create
-  async createUser(userData: Partial<User>): Promise<Result<void>> {
+  async createUser(
+    userData: Partial<User>,
+  ): Promise<{ statusCode: number; message: string }> {
     try {
       const newUser = this.userRepository.create(userData);
-
       await this.userRepository.save(newUser);
-      return new Result(0, null, 'User created successfully');
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'User created successfully.',
+      };
     } catch (error) {
-      console.log(error);
+      console.error('Create User Error:', error);
       throw new HttpException(
         'Internal server error',
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -85,17 +105,20 @@ export class UsersService {
   }
 
   // delete user
-  async deleteUser(id: number): Promise<Result<void>> {
+  async deleteUser(
+    id: number,
+  ): Promise<{ statusCode: number; message: string }> {
     try {
-      const data = await this.userRepository.delete(id);
-      if (data.affected === 0) {
-        return new Result(-1, null, 'User not found');
+      const result = await this.userRepository.delete(id);
+      if (result.affected === 0) {
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
       }
-
-      console.log('check data:', data);
-      return new Result(0, null, 'User deleted successfully');
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'User deleted successfully.',
+      };
     } catch (error) {
-      console.log(error);
+      console.error('Delete User Error:', error);
       throw new HttpException(
         'Internal server error',
         HttpStatus.INTERNAL_SERVER_ERROR,
