@@ -23,14 +23,12 @@ export class AuthController {
     @Body('name') name: string,
   ): Promise<any> {
     try {
-      if (password.trim() !== confirmPassword.trim()) {
-        throw new HttpException(
-          'Passwords do not match',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
-      const result = await this.authService.registerUser(email, password, name);
+      const result = await this.authService.registerUser(
+        email,
+        password,
+        name,
+        confirmPassword,
+      );
       return {
         statusCode: HttpStatus.CREATED,
         message: result.message,

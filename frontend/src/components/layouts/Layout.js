@@ -8,7 +8,9 @@ const cx = classNames.bind(styles);
 
 const Layout = ({ children }) => {
     const location = useLocation();
-    const showHeader = location.pathname !== "/login";
+
+    const excludedPaths = ["/login", "/register", "/anotherPath"];
+    const showHeader = !excludedPaths.includes(location.pathname);
 
     return (
         <div className="app">

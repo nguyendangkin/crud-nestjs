@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -60,6 +61,11 @@ const Login = () => {
                             >
                                 Login
                             </Button>
+                        </div>
+                        <div className="mt-3">
+                            <Link to={"/register"}>
+                                Do you have account? Go to Register now!
+                            </Link>
                         </div>
                     </Form>
                 </Col>

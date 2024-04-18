@@ -1,23 +1,24 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { requestLogin } from "./../requestApi/userAccount/userAccount";
-
-const initialState = {
-    userInfo: {
-        name: "",
-    },
-};
+import { requestRegister } from "./../requestApi/userAccount/userAccount";
 
 export const counterSlice = createSlice({
     name: "user",
-    initialState,
+    initialState: {
+        userInfo: null,
+        loading: false,
+    },
     reducers: {},
     extraReducers: (builder) => {
-        // Add reducers for additional action types here, and handle loading state as needed
-        builder.addCase(requestLogin.pending, (state, action) => {});
-        builder.addCase(requestLogin.fulfilled, (state, action) => {
+        builder.addCase(requestRegister.pending, (state, action) => {
+            state.loading = true;
+        });
+        builder.addCase(requestRegister.fulfilled, (state, action) => {
+            state.loading = false;
             state.userInfo = action.payload;
         });
-        builder.addCase(requestLogin.rejected, (state, action) => {});
+        builder.addCase(requestRegister.rejected, (state, action) => {
+            state.loading = false;
+        });
     },
 });
 

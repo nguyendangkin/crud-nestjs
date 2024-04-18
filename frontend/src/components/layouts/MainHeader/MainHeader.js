@@ -1,6 +1,6 @@
 import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import classNames from "classnames/bind";
 import styles from "./MainHeader.module.scss";
@@ -12,10 +12,10 @@ const cx = classNames.bind(styles);
 function MainHeader() {
     const userInfo = useSelector((state) => state.user.userInfo);
 
-    const [isActive, setIsActive] = useState(false);
+    const navigate = useNavigate();
 
-    const handleOnClick = (e) => {
-        setIsActive(!isActive);
+    const handleLogin = () => {
+        navigate("/login");
     };
 
     return (
@@ -31,8 +31,11 @@ function MainHeader() {
                 </Nav.Link>
             </Nav.Item>
             <div className="ms-auto">
-                Xin Chào <span className="fw-bold">An</span>
-                <Button className="btn-sm ms-4">Đăng xuất</Button>
+                {/* Xin Chào <span className="fw-bold">An</span> */}
+                {/* <Button className="btn-sm ms-4">Đăng xuất</Button> */}
+                <Button onClick={() => handleLogin()} className="btn-sm ms-4">
+                    Đăng nhập
+                </Button>
             </div>
         </Nav>
     );

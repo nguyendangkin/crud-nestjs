@@ -5,6 +5,7 @@ import Layout from "../layouts/Layout";
 import Home from "../pages/Home/Home";
 import ManagerUser from "../pages/ManagerUser/ManagerUser";
 import Login from "../pages/Login/Login";
+import Register from "../pages/Register/Register";
 
 const AppRouter = () => {
     return (
@@ -31,6 +32,14 @@ const AppRouter = () => {
                     element={
                         <Layout>
                             <Login />
+                        </Layout>
+                    }
+                />
+                <Route
+                    path="/register"
+                    element={
+                        <Layout>
+                            <Register />
                         </Layout>
                     }
                 />

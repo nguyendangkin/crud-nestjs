@@ -18,6 +18,7 @@ export class AuthService {
     email: string,
     password: string,
     name: string,
+    confirmPassword: string,
   ): Promise<any> {
     try {
       const existingUser = await this.userRepository.findOneBy({ email });
