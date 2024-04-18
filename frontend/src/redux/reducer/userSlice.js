@@ -9,7 +9,6 @@ export const counterSlice = createSlice({
     initialState: {
         userInfo: null,
         loading: false,
-        error: null,
     },
     reducers: {},
     extraReducers: (builder) => {
@@ -19,11 +18,9 @@ export const counterSlice = createSlice({
         builder.addCase(requestRegister.fulfilled, (state, action) => {
             state.loading = false;
             state.userInfo = action.payload;
-            state.error = null;
         });
         builder.addCase(requestRegister.rejected, (state, action) => {
             state.loading = false;
-            state.error = action.payload.message;
         });
         builder.addCase(requestLogin.pending, (state, action) => {
             state.loading = true;
@@ -31,11 +28,9 @@ export const counterSlice = createSlice({
         builder.addCase(requestLogin.fulfilled, (state, action) => {
             state.loading = false;
             state.userInfo = action.payload;
-            state.error = null;
         });
         builder.addCase(requestLogin.rejected, (state, action) => {
             state.loading = false;
-            state.error = action.payload.message;
         });
     },
 });

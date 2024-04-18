@@ -6,9 +6,11 @@ import {
   Post,
   UseGuards,
   Request,
+  Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -41,7 +43,7 @@ export class AuthController {
   // Login
   @UseGuards(AuthGuard('local'))
   @Post('login')
-  async login(@Request() req) {
+  async login(@Request() req, @Res({ passthrough: true }) res: Response) {
     if (!req.user || req.user.statusCode === 401) {
       return {
         statusCode: req.user.statusCode,
@@ -49,10 +51,21 @@ export class AuthController {
       };
     }
 
+    const { refreshToken, accessToken, userProfile } = req.user;
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), //30 day
+    });
+
     return {
       statusCode: HttpStatus.OK,
       message: 'Login successful',
-      user: req.user,
+      accessToken,
+      userProfile,
     };
   }
 }

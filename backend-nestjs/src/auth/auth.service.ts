@@ -63,13 +63,13 @@ export class AuthService {
       const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
       const refreshToken = this.jwtService.sign(
         { userId: user.id },
-        { expiresIn: '7d' },
+        { expiresIn: '30d' },
       );
 
       return {
         accessToken,
         refreshToken,
-        user: {
+        userProfile: {
           email: user.email,
           name: user.name,
         },

@@ -3,6 +3,7 @@ import axios from "axios";
 // Set config defaults when creating the instance
 const instance = axios.create({
     baseURL: "http://localhost:3001/",
+    withCredentials: true,
 });
 
 // Alter defaults after instance has been created
