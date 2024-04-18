@@ -1,16 +1,47 @@
 import { useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { requestLogin } from "../../../redux/requestApi/userAccount/userAccount";
+import { unwrapResult } from "@reduxjs/toolkit";
 
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [submitted, setSubmitted] = useState(false);
 
-    const handleSubmit = () => {
-        alert("hello");
+    const dispatch = useDispatch();
+
+    const navigate = useNavigate();
+
+    const validFrom = () => {
+        let valid = true;
+
+        if (email.trim() === "") {
+            return false;
+        }
+        if (password.trim() === "") {
+            return false;
+        }
+
+        return valid;
+    };
+
+    const handleSubmit = async () => {
         setSubmitted(true);
-        console.log("Login Attempt:", email, password);
+        if (validFrom()) {
+            const data = {
+                email,
+                password,
+            };
+            try {
+                const actionResult = await dispatch(requestLogin(data));
+                const result = unwrapResult(actionResult);
+                if (result.statusCode === 200) {
+                    navigate("/");
+                }
+            } catch (error) {}
+        }
     };
 
     return (
@@ -20,10 +51,7 @@ const Login = () => {
         >
             <Row>
                 <Col md={12} className="mx-auto">
-                    <Form
-                        className="p-4 border rounded-3 bg-light"
-                        onSubmit={handleSubmit}
-                    >
+                    <Form className="p-4 border rounded-3 bg-light">
                         <h3 className="text-center mb-3">Login</h3>
                         <Form.Group className="mb-3" controlId="formBasicEmail">
                             <Form.Control
@@ -34,7 +62,7 @@ const Login = () => {
                                 isInvalid={submitted && !email}
                             />
                             <Form.Control.Feedback type="invalid">
-                                Please enter a valid email address.
+                                Please enter a email address.
                             </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group

@@ -23,10 +23,10 @@ export class AuthService {
     try {
       const existingUser = await this.userRepository.findOneBy({ email });
       if (existingUser) {
-        throw new HttpException(
-          'User already registered',
-          HttpStatus.BAD_REQUEST,
-        );
+        return {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: 'User already registered',
+        };
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -42,29 +42,21 @@ export class AuthService {
         message: 'User registered successfully',
       };
     } catch (error) {
-      console.error('Registration Error:', error);
-      if (error instanceof HttpException) {
-        throw error;
-      }
-
-      throw new HttpException(
-        'Registration failed',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      console.log(error);
     }
   }
 
-  // Login and validate user
+  // Login and validate
   async validateUser(email: string, password: string): Promise<any> {
     try {
       const user = await this.userRepository.findOne({ where: { email } });
       if (!user) {
-        throw new HttpException('Email does not exist', HttpStatus.BAD_REQUEST);
+        return false;
       }
 
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
-        throw new HttpException('Invalid password', HttpStatus.BAD_REQUEST);
+        return false;
       }
 
       const payload = { userId: user.id, email: user.email }; // roles: user.roles
@@ -74,11 +66,7 @@ export class AuthService {
         { expiresIn: '7d' },
       );
 
-      const token = this.jwtService.sign(payload);
-
       return {
-        statusCode: HttpStatus.OK,
-        message: 'Login successful',
         accessToken,
         refreshToken,
         user: {
@@ -87,8 +75,7 @@ export class AuthService {
         },
       };
     } catch (error) {
-      console.error('Validation Error:', error);
-      throw new HttpException('Login failed', HttpStatus.INTERNAL_SERVER_ERROR);
+      console.log(error);
     }
   }
 }

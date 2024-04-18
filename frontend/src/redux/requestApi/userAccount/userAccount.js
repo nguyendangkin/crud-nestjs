@@ -4,30 +4,30 @@ import { toast } from "react-toastify";
 
 export const requestRegister = createAsyncThunk(
     "user/requestRegister",
-    async (userData, { rejectWithValue }) => {
+    async (userData) => {
         try {
             const response = await axios.post("/auth/register", userData);
             if (response.data.statusCode === 201) {
                 toast.success(response.data.message);
+            } else {
+                toast.error(response.data.message);
             }
             return response.data;
-        } catch (error) {
-            if (error.response) {
-                toast.error(
-                    error.response.data.message || "An unknown error occurred 1"
-                );
-                return rejectWithValue({
-                    statusCode: error.response.data.statusCode,
-                    message:
-                        error.response.data.message ||
-                        "An unknown error occurred 2",
-                });
+        } catch (error) {}
+    }
+);
+
+export const requestLogin = createAsyncThunk(
+    "user/requestLogin",
+    async (userData) => {
+        try {
+            const response = await axios.post("/auth/login", userData);
+            if (response.data.statusCode === 200) {
+                toast.success(response.data.message);
+            } else {
+                toast.error(response.data.message);
             }
-            toast.error("An unknown error occurred 3");
-            return rejectWithValue({
-                statusCode: 500,
-                message: "An unknown error occurred 4",
-            });
-        }
+            return response.data;
+        } catch (error) {}
     }
 );

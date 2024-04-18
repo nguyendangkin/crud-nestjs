@@ -30,14 +30,11 @@ export class AuthController {
         confirmPassword,
       );
       return {
-        statusCode: HttpStatus.CREATED,
+        statusCode: result.statusCode,
         message: result.message,
       };
     } catch (error) {
-      throw new HttpException(
-        error.response || 'Registration failed',
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      console.log(error);
     }
   }
 
@@ -45,23 +42,17 @@ export class AuthController {
   @UseGuards(AuthGuard('local'))
   @Post('login')
   async login(@Request() req) {
-    try {
-      if (!req.user) {
-        throw new HttpException(
-          'User not authenticated',
-          HttpStatus.UNAUTHORIZED,
-        );
-      }
+    if (!req.user || req.user.statusCode === 401) {
       return {
-        statusCode: HttpStatus.OK,
-        message: 'Login successful',
-        user: req.user,
+        statusCode: req.user.statusCode,
+        message: req.user.message,
       };
-    } catch (error) {
-      throw new HttpException(
-        error.response || 'Login failed',
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
-      );
     }
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Login successful',
+      user: req.user,
+    };
   }
 }
