@@ -13,7 +13,11 @@ export const requestRegister = createAsyncThunk(
                 toast.error(response.data.message);
             }
             return response.data;
-        } catch (error) {}
+        } catch (error) {
+            toast.error(
+                "Cannot connect to the server. Please check your internet connection."
+            );
+        }
     }
 );
 
@@ -28,7 +32,11 @@ export const requestLogin = createAsyncThunk(
                 toast.error(response.data.message);
             }
             return response.data;
-        } catch (error) {}
+        } catch (error) {
+            toast.error(
+                "Cannot connect to the server. Please check your internet connection."
+            );
+        }
     }
 );
 
@@ -37,6 +45,10 @@ export const requestLogout = createAsyncThunk(
     async () => {
         try {
             await axios.post("/auth/logout");
-        } catch (error) {}
+        } catch (error) {
+            toast.error(
+                "Cannot connect to the server. Please check your internet connection."
+            );
+        }
     }
 );

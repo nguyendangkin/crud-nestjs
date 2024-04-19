@@ -1,10 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from './user.entity';
+import { User } from '../common/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+import { GroupRole } from 'src/common/groupRole.entity';
 
 @Injectable()
 export class AuthService {
@@ -50,7 +51,10 @@ export class AuthService {
   // Login and validate
   async validateUser(email: string, password: string): Promise<any> {
     try {
-      const user = await this.userRepository.findOne({ where: { email } });
+      const user = await this.userRepository.findOne({
+        where: { email },
+        relations: ['group', 'group.groupRoles', 'group.groupRoles.role'],
+      });
       if (!user) {
         return false;
       }
@@ -60,10 +64,17 @@ export class AuthService {
         return false;
       }
 
-      const payload = { userId: user.id, email: user.email }; // roles: user.roles
+      const userRole = user.group.groupRoles.map((groupRole) => ({
+        name: groupRole.role.role,
+        permissions: groupRole.role.permissions,
+      }))[0];
+
+      const payload = { userId: user.id, email: user.email, role: userRole };
+
       const accessToken = this.jwtService.sign(payload, {
         expiresIn: this.configService.get<string>('EXPIRESIN_ACCESS_TOKEN'),
       });
+
       const refreshToken = this.jwtService.sign(
         { userId: user.id },
         {
