@@ -11,10 +11,14 @@ import {
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private configService: ConfigService,
+  ) {}
 
   // Register
   @Post('register')
@@ -25,12 +29,7 @@ export class AuthController {
     @Body('name') name: string,
   ): Promise<any> {
     try {
-      const result = await this.authService.registerUser(
-        email,
-        password,
-        name,
-        confirmPassword,
-      );
+      const result = await this.authService.registerUser(email, password, name);
       return {
         statusCode: result.statusCode,
         message: result.message,
@@ -52,13 +51,16 @@ export class AuthController {
     }
 
     const { refreshToken, accessToken, userProfile } = req.user;
-
+    const daysToExpire = parseInt(
+      this.configService.get<string>('EXPIRESIN_COOKIE_REFRESH_TOKEN'),
+    );
+    const expiresInMilliseconds = daysToExpire * 24 * 60 * 60 * 1000;
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       path: '/',
-      expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), //30 day
+      expires: new Date(Date.now() + expiresInMilliseconds),
     });
 
     return {

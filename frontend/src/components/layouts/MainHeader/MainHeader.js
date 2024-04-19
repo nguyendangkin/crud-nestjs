@@ -10,7 +10,7 @@ import Button from "react-bootstrap/esm/Button";
 const cx = classNames.bind(styles);
 
 function MainHeader() {
-    const userInfo = useSelector((state) => state.user.userInfo);
+    const { userInfo } = useSelector((state) => state.user);
 
     const navigate = useNavigate();
 
@@ -31,11 +31,23 @@ function MainHeader() {
                 </Nav.Link>
             </Nav.Item>
             <div className="ms-auto">
-                {/* Xin Chào <span className="fw-bold">An</span> */}
-                {/* <Button className="btn-sm ms-4">Đăng xuất</Button> */}
-                <Button onClick={() => handleLogin()} className="btn-sm ms-4">
-                    Đăng nhập
-                </Button>
+                {userInfo && userInfo.accessToken ? (
+                    <>
+                        Xin Chào{" "}
+                        <span className="fw-bold">
+                            {userInfo.userProfile.name}
+                        </span>
+                        <Button className="btn-sm ms-4">Đăng xuất</Button>
+                    </>
+                ) : (
+                    <Button
+                        variant="success"
+                        onClick={() => handleLogin()}
+                        className="btn-sm ms-4"
+                    >
+                        Đăng nhập
+                    </Button>
+                )}
             </div>
         </Nav>
     );

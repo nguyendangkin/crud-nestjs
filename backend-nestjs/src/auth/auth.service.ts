@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -11,6 +12,7 @@ export class AuthService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
 
   // Register user
@@ -18,7 +20,6 @@ export class AuthService {
     email: string,
     password: string,
     name: string,
-    confirmPassword: string,
   ): Promise<any> {
     try {
       const existingUser = await this.userRepository.findOneBy({ email });
@@ -60,10 +61,14 @@ export class AuthService {
       }
 
       const payload = { userId: user.id, email: user.email }; // roles: user.roles
-      const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
+      const accessToken = this.jwtService.sign(payload, {
+        expiresIn: this.configService.get<string>('EXPIRESIN_ACCESS_TOKEN'),
+      });
       const refreshToken = this.jwtService.sign(
         { userId: user.id },
-        { expiresIn: '30d' },
+        {
+          expiresIn: this.configService.get<string>('EXPIRESIN_REFRESH_TOKEN'),
+        },
       );
 
       return {
