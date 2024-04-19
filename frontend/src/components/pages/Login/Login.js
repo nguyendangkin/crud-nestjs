@@ -1,18 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { requestLogin } from "../../../redux/requestApi/userAccount/userAccount";
+import { useDispatch, useSelector } from "react-redux";
+import { requestLogin } from "../../../redux/requestApi/auth/userAuth";
 import { unwrapResult } from "@reduxjs/toolkit";
+import { toast } from "react-toastify";
 
 const Login = () => {
+    const { userInfo } = useSelector((state) => state.user);
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [submitted, setSubmitted] = useState(false);
 
     const dispatch = useDispatch();
-
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (userInfo && userInfo.accessToken) {
+            navigate("/");
+        }
+    }, [userInfo, navigate]);
 
     const validFrom = () => {
         let valid = true;

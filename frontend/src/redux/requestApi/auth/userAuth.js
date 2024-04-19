@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "./../../../configAxios/axios";
+import axios from "../../../configAxios/axios";
 import { toast } from "react-toastify";
 
 export const requestRegister = createAsyncThunk(
@@ -28,6 +28,15 @@ export const requestLogin = createAsyncThunk(
                 toast.error(response.data.message);
             }
             return response.data;
+        } catch (error) {}
+    }
+);
+
+export const requestLogout = createAsyncThunk(
+    "user/requestLogout",
+    async () => {
+        try {
+            await axios.post("/auth/logout");
         } catch (error) {}
     }
 );

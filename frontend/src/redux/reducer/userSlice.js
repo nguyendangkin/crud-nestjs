@@ -1,8 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {
-    requestLogin,
-    requestRegister,
-} from "./../requestApi/userAccount/userAccount";
+import { requestLogin, requestRegister } from "../requestApi/auth/userAuth";
 
 export const counterSlice = createSlice({
     name: "user",
@@ -10,7 +7,11 @@ export const counterSlice = createSlice({
         userInfo: null,
         loading: false,
     },
-    reducers: {},
+    reducers: {
+        logoutUser: (state) => {
+            state.userInfo = null;
+        },
+    },
     extraReducers: (builder) => {
         builder.addCase(requestRegister.pending, (state, action) => {
             state.loading = true;
@@ -35,5 +36,5 @@ export const counterSlice = createSlice({
     },
 });
 
-export const { increment, decrement, incrementByAmount } = counterSlice.actions;
+export const { logoutUser } = counterSlice.actions;
 export default counterSlice.reducer;

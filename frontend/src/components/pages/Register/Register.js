@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { requestRegister } from "../../../redux/requestApi/userAccount/userAccount";
+import { requestRegister } from "../../../redux/requestApi/auth/userAuth";
 import { unwrapResult } from "@reduxjs/toolkit";
 
 const Register = () => {

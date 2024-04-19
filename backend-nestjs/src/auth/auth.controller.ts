@@ -70,4 +70,19 @@ export class AuthController {
       userProfile,
     };
   }
+
+  // logout
+  @Post('/logout')
+  async logout(
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<{ statusCode: number; message: string }> {
+    res.cookie('refreshToken', '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      expires: new Date(0),
+    });
+    return { statusCode: HttpStatus.OK, message: 'Logout successful' };
+  }
 }
