@@ -94,13 +94,13 @@ export class UsersController {
   }
 
   // Delete user
-  @Delete(':id')
+  @Delete(':id') // Định nghĩa endpoint xóa theo ID
   async deleteTheUser(@Param('id') id: number) {
     try {
-      const result = await this.userService.deleteUser(id);
+      const result = await this.userService.deleteUser(id); // Sử dụng ID để xóa
       return {
-        statusCode: result.statusCode,
-        message: result.message,
+        statusCode: HttpStatus.OK,
+        message: 'User deleted successfully.',
       };
     } catch (error) {
       throw new HttpException(

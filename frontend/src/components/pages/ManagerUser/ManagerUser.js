@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Table, Button } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import {
+    requestDeleteUser,
     requestFindAllUsers,
     requestUpdateUser,
 } from "../../../redux/requestApi/usersCRUD/usersCRUD";
@@ -40,10 +41,10 @@ const ManagerUser = () => {
         setShowEditModal(false);
     };
 
-    const handleDelete = (id) => {
+    const handleDelete = async (id) => {
         if (userPermissions.includes("delete")) {
-            // Xử lý xóa người dùng
-            alert("deleted");
+            await dispatch(requestDeleteUser(id));
+            await dispatch(requestFindAllUsers());
         } else {
             toast.error("You don't have permission to delete");
         }

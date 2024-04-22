@@ -113,9 +113,11 @@ export class UsersService {
   ): Promise<{ statusCode: number; message: string }> {
     try {
       const result = await this.userRepository.delete(id);
+
       if (result.affected === 0) {
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
       }
+
       return {
         statusCode: HttpStatus.OK,
         message: 'User deleted successfully.',
