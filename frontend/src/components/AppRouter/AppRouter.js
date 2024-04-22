@@ -9,6 +9,7 @@ import Register from "../pages/Register/Register";
 import UserProfile from "../pages/UserProfile/UserProfile";
 import RoleBasedRoute from "../RoleBasedRoute/RoleBasedRoute";
 import NoAccess from "../pages/NoAccess/NoAccess ";
+import About from "../pages/About/About";
 
 const AppRouter = () => {
     return (
@@ -68,6 +69,21 @@ const AppRouter = () => {
                         <Layout>
                             <Register />
                         </Layout>
+                    }
+                />
+
+                <Route
+                    path="/about/*"
+                    element={
+                        <RoleBasedRoute
+                            path="/"
+                            requiredRole="another"
+                            component={
+                                <Layout>
+                                    <About />
+                                </Layout>
+                            }
+                        />
                     }
                 />
 

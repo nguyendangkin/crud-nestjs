@@ -43,6 +43,11 @@ function MainHeader() {
                     User Profile
                 </Nav.Link>
             </Nav.Item>
+            <Nav.Item>
+                <Nav.Link as={Link} to={"/about"}>
+                    About
+                </Nav.Link>
+            </Nav.Item>
             <div className="ms-auto">
                 {userInfo && userInfo.accessToken ? (
                     <>

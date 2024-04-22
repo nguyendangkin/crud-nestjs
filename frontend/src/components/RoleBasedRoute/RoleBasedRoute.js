@@ -12,18 +12,21 @@ const RoleBasedRoute = ({ path, requiredRole, component }) => {
     }
 
     const decodedToken = jwtDecode(accessToken);
-    const userRole = decodedToken.role.name;
+
+    const userRoles = decodedToken?.role;
+
+    if (!userRoles || !Array.isArray(userRoles)) {
+        return <Navigate to="/login" />;
+    }
+
+    const hasRequiredRole = userRoles.some((r) => r.name === requiredRole);
 
     return (
         <Routes>
             <Route
                 path={path}
                 element={
-                    userRole === requiredRole ? (
-                        component
-                    ) : (
-                        <Navigate to="/no-access" />
-                    )
+                    hasRequiredRole ? component : <Navigate to="/no-access" />
                 }
             />
         </Routes>

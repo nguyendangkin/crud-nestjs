@@ -55,6 +55,7 @@ export class AuthService {
         where: { email },
         relations: ['group', 'group.groupRoles', 'group.groupRoles.role'],
       });
+
       if (!user) {
         return false;
       }
@@ -67,7 +68,9 @@ export class AuthService {
       const userRole = user.group.groupRoles.map((groupRole) => ({
         name: groupRole.role.role,
         permissions: groupRole.role.permissions,
-      }))[0];
+      }));
+
+      console.log('check role', userRole);
 
       const payload = { userId: user.id, email: user.email, role: userRole };
 
