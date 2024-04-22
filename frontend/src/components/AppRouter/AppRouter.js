@@ -7,6 +7,8 @@ import ManagerUser from "../pages/ManagerUser/ManagerUser";
 import Login from "../pages/Login/Login";
 import Register from "../pages/Register/Register";
 import UserProfile from "../pages/UserProfile/UserProfile";
+import RoleBasedRoute from "../RoleBasedRoute/RoleBasedRoute";
+import NoAccess from "../pages/NoAccess/NoAccess ";
 
 const AppRouter = () => {
     return (
@@ -20,14 +22,37 @@ const AppRouter = () => {
                         </Layout>
                     }
                 />
+
                 <Route
-                    path="/manager-user"
+                    path="/manager-user/*"
                     element={
-                        <Layout>
-                            <ManagerUser />
-                        </Layout>
+                        <RoleBasedRoute
+                            path="/"
+                            requiredRole="admin"
+                            component={
+                                <Layout>
+                                    <ManagerUser />
+                                </Layout>
+                            }
+                        />
                     }
                 />
+
+                <Route
+                    path="/user-profile/*"
+                    element={
+                        <RoleBasedRoute
+                            path="/"
+                            requiredRole="user"
+                            component={
+                                <Layout>
+                                    <UserProfile />
+                                </Layout>
+                            }
+                        />
+                    }
+                />
+
                 <Route
                     path="/login"
                     element={
@@ -36,6 +61,7 @@ const AppRouter = () => {
                         </Layout>
                     }
                 />
+
                 <Route
                     path="/register"
                     element={
@@ -44,14 +70,16 @@ const AppRouter = () => {
                         </Layout>
                     }
                 />
+
                 <Route
-                    path="/user-profile"
+                    path="/no-access"
                     element={
                         <Layout>
-                            <UserProfile />
+                            <NoAccess />
                         </Layout>
                     }
                 />
+
                 <Route
                     path="*"
                     element={
