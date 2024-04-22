@@ -17,8 +17,11 @@ export class UsersService {
     message: string;
   }> {
     try {
-      const users = await this.userRepository.find();
-      console.log('check data', users);
+      const users = await this.userRepository.find({
+        order: {
+          id: 'DESC',
+        },
+      });
 
       if (users.length === 0) {
         throw new HttpException('No users found', HttpStatus.NOT_FOUND);

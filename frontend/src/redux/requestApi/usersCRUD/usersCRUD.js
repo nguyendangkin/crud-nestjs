@@ -2,30 +2,12 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "../../../configAxios/axios";
 import { toast } from "react-toastify";
 
-export const requestRegister = createAsyncThunk(
-    "user/requestRegister",
-    async (userData) => {
+export const requestFindAllUsers = createAsyncThunk(
+    "user/requestFindAllUsers",
+    async () => {
         try {
-            const response = await axios.post("/auth/register", userData);
-            if (response.data.statusCode === 201) {
-                toast.success(response.data.message);
-            } else {
-                toast.error(response.data.message);
-            }
-            return response.data;
-        } catch (error) {
-            toast.error(
-                "Cannot connect to the server. Please check your internet connection."
-            );
-        }
-    }
-);
+            const response = await axios.get("/users");
 
-export const requestLogin = createAsyncThunk(
-    "user/requestLogin",
-    async (userData) => {
-        try {
-            const response = await axios.post("/auth/login", userData);
             if (response.data.statusCode === 200) {
                 // toast.success(response.data.message);
             } else {
@@ -40,11 +22,19 @@ export const requestLogin = createAsyncThunk(
     }
 );
 
-export const requestLogout = createAsyncThunk(
-    "user/requestLogout",
-    async () => {
+export const requestUpdateUser = createAsyncThunk(
+    "user/requestUpdateUser",
+    async (dataUser) => {
         try {
-            await axios.post("/auth/logout");
+            const response = await axios.post("/users", dataUser);
+
+            if (response.data.statusCode === 200) {
+                // toast.success(response.data.message);
+            } else {
+                toast.error(response.data.message);
+            }
+
+            // return response.data;
         } catch (error) {
             toast.error(
                 "Cannot connect to the server. Please check your internet connection."

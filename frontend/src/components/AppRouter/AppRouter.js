@@ -29,7 +29,7 @@ const AppRouter = () => {
                     element={
                         <RoleBasedRoute
                             path="/"
-                            requiredRole="admin"
+                            requiredRoles={["admin", "editor"]}
                             component={
                                 <Layout>
                                     <ManagerUser />
@@ -44,7 +44,7 @@ const AppRouter = () => {
                     element={
                         <RoleBasedRoute
                             path="/"
-                            requiredRole="user"
+                            requiredRoles={["user", "admin"]}
                             component={
                                 <Layout>
                                     <UserProfile />
@@ -77,7 +77,7 @@ const AppRouter = () => {
                     element={
                         <RoleBasedRoute
                             path="/"
-                            requiredRole="another"
+                            requiredRoles={["another"]}
                             component={
                                 <Layout>
                                     <About />

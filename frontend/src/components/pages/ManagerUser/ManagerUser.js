@@ -1,32 +1,70 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Table, Button } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import {
+    requestFindAllUsers,
+    requestUpdateUser,
+} from "../../../redux/requestApi/usersCRUD/usersCRUD";
+import EditUserModal from "../../modal/EditUserModal";
+import { jwtDecode } from "jwt-decode";
+import { toast } from "react-toastify";
+import { updateUserInfo } from "../../../redux/reducer/userSlice";
 
 const ManagerUser = () => {
-    const [users, setUsers] = useState([
-        { id: 1, email: "john.doe@example.com", name: "John Doe" },
-        { id: 2, email: "jane.doe@example.com", name: "Jane Doe" },
-    ]);
+    const data = useSelector((state) => state.userCRUD?.listUsers?.data);
+    const accessToken = useSelector(
+        (state) => state.user?.userInfo?.accessToken
+    );
+    const decodedToken = accessToken ? jwtDecode(accessToken) : null;
 
-    const handleDelete = (id) => {
-        setUsers(users.filter((user) => user.id !== id));
-    };
+    const userPermissions = decodedToken?.role?.[0]?.permissions || [];
+
+    const dispatch = useDispatch();
+    const [showEditModal, setShowEditModal] = useState(false); // Để kiểm soát modal
+    const [selectedUser, setSelectedUser] = useState(null); // Lưu thông tin người dùng được chọn
+
+    useEffect(() => {
+        dispatch(requestFindAllUsers());
+    }, []);
 
     const handleEdit = (user) => {
-        // Làm logic để chỉnh sửa user
-        // Thường là mở một form với dữ liệu đã được điền trước
-        console.log("Edit:", user);
+        setShowEditModal(true); // Mở modal
+        setSelectedUser({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+        });
+    };
+
+    const handleUpdateUser = () => {
+        setShowEditModal(false);
+    };
+
+    const handleDelete = (id) => {
+        if (userPermissions.includes("delete")) {
+            // Xử lý xóa người dùng
+            alert("deleted");
+        } else {
+            toast.error("You don't have permission to delete");
+        }
     };
 
     const handleCreate = () => {
-        // Thêm logic để tạo user mới
-        // Thường là mở một form rỗng để điền thông tin
-        const newUser = { id: users.length + 1, email: "", name: "" };
-        setUsers([...users, newUser]);
-        console.log("Create new user");
+        if (userPermissions.includes("create")) {
+            // Xử lý tạo mới
+            alert("created");
+        } else {
+            toast.error("You don't have permission to create");
+        }
     };
+
     return (
         <div>
-            <Button onClick={handleCreate} className="mb-3">
+            <Button
+                disabled={!userPermissions.includes("create")}
+                onClick={() => handleCreate()}
+                className="mb-3"
+            >
                 Create New User
             </Button>
             <Table striped bordered hover>
@@ -39,7 +77,7 @@ const ManagerUser = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {users.map((user) => (
+                    {data?.map((user) => (
                         <tr key={user.id}>
                             <td>{user.id}</td>
                             <td>{user.email}</td>
@@ -54,6 +92,9 @@ const ManagerUser = () => {
                                 <Button
                                     variant="danger"
                                     onClick={() => handleDelete(user.id)}
+                                    disabled={
+                                        !userPermissions.includes("delete")
+                                    }
                                 >
                                     Delete
                                 </Button>
@@ -62,6 +103,12 @@ const ManagerUser = () => {
                     ))}
                 </tbody>
             </Table>
+            <EditUserModal
+                show={showEditModal}
+                handleClose={() => setShowEditModal(false)}
+                user={selectedUser}
+                handleUpdate={handleUpdateUser}
+            />
         </div>
     );
 };

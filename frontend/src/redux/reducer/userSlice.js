@@ -11,6 +11,12 @@ export const counterSlice = createSlice({
         logoutUser: (state) => {
             state.userInfo = null;
         },
+
+        updateUserInfo: (state, action) => {
+            if (state.userInfo && state.userInfo.userProfile) {
+                state.userInfo.userProfile.name = action.payload.name;
+            }
+        },
     },
     extraReducers: (builder) => {
         builder.addCase(requestRegister.pending, (state, action) => {
@@ -23,6 +29,7 @@ export const counterSlice = createSlice({
         builder.addCase(requestRegister.rejected, (state, action) => {
             state.loading = false;
         });
+        //
         builder.addCase(requestLogin.pending, (state, action) => {
             state.loading = true;
         });
@@ -36,5 +43,5 @@ export const counterSlice = createSlice({
     },
 });
 
-export const { logoutUser } = counterSlice.actions;
+export const { logoutUser, updateUserInfo } = counterSlice.actions;
 export default counterSlice.reducer;

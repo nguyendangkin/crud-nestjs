@@ -23,7 +23,7 @@ function MainHeader() {
     const handleLogout = async () => {
         dispatch(logoutUser());
         dispatch(requestLogout());
-        toast.success("Logout Success!");
+        // toast.success("Logout Success!");
     };
 
     return (

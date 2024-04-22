@@ -7,10 +7,17 @@ import {
   HttpStatus,
   Post,
   Delete,
+  UseGuards, // Sử dụng UseGuards để áp dụng Guards
+  SetMetadata, // Để chỉ định vai trò yêu cầu
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from '../common/user.entity';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard'; // Guard để xác thực JWT
+import { RoleGuard } from '../auth/role.guard'; // Guard để kiểm tra vai trò
 
+// @UseGuards(JwtAuthGuard) // Bảo vệ toàn bộ Controller bằng JwtAuthGuard
+// @SetMetadata('roles', ['admin']) // Chỉ định vai trò 'admin'
+// @UseGuards(RoleGuard) // Sử dụng RoleGuard để kiểm tra vai trò
 @Controller('users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
@@ -69,12 +76,10 @@ export class UsersController {
   }
 
   // Update user
-  @Post(':id')
-  async updateUserById(
-    @Param('id') id: number,
-    @Body() updateData: Partial<User>,
-  ) {
+  @Post()
+  async updateUserById(@Body() updateData: Partial<User>) {
     try {
+      const id = updateData.id;
       const result = await this.userService.updateUserById(id, updateData);
       return {
         statusCode: result.statusCode,

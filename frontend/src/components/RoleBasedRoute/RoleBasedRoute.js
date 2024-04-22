@@ -2,7 +2,7 @@ import { Route, Navigate, Routes } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 
-const RoleBasedRoute = ({ path, requiredRole, component }) => {
+const RoleBasedRoute = ({ path, requiredRoles, component }) => {
     const accessToken = useSelector(
         (state) => state.user?.userInfo?.accessToken
     );
@@ -13,22 +13,25 @@ const RoleBasedRoute = ({ path, requiredRole, component }) => {
 
     const decodedToken = jwtDecode(accessToken);
 
-    const userRoles = decodedToken?.role;
+    const userRoles = Array.isArray(decodedToken?.role)
+        ? decodedToken.role
+        : [];
 
-    if (!userRoles || !Array.isArray(userRoles)) {
-        return <Navigate to="/login" />;
+    const validRequiredRoles = Array.isArray(requiredRoles)
+        ? requiredRoles
+        : [requiredRoles];
+
+    const hasRequiredRole = userRoles.some((r) =>
+        validRequiredRoles.includes(r.name)
+    );
+
+    if (!hasRequiredRole) {
+        return <Navigate to="/no-access" />;
     }
-
-    const hasRequiredRole = userRoles.some((r) => r.name === requiredRole);
 
     return (
         <Routes>
-            <Route
-                path={path}
-                element={
-                    hasRequiredRole ? component : <Navigate to="/no-access" />
-                }
-            />
+            <Route path={path} element={component} />
         </Routes>
     );
 };

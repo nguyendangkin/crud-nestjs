@@ -1,7 +1,7 @@
 const NoAccess = () => {
     return (
         <div>
-            <h1>Bạn không có quyền truy cập vào trang này.</h1>
+            <h1>You don't have access this page!</h1>
         </div>
     );
 };
