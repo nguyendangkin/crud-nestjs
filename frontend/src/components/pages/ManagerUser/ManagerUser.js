@@ -10,6 +10,7 @@ import EditUserModal from "../../modal/EditUserModal";
 import { jwtDecode } from "jwt-decode";
 import { toast } from "react-toastify";
 import { updateUserInfo } from "../../../redux/reducer/userSlice";
+import CreateUserModal from "../../modal/CreateUserModal";
 
 const ManagerUser = () => {
     const data = useSelector((state) => state.userCRUD?.listUsers?.data);
@@ -21,15 +22,16 @@ const ManagerUser = () => {
     const userPermissions = decodedToken?.role?.[0]?.permissions || [];
 
     const dispatch = useDispatch();
-    const [showEditModal, setShowEditModal] = useState(false); // Để kiểm soát modal
-    const [selectedUser, setSelectedUser] = useState(null); // Lưu thông tin người dùng được chọn
+    const [showEditModal, setShowEditModal] = useState(false); // For Edit User Modal control
+    const [showCreateModal, setShowCreateModal] = useState(false); // For Create User Modal control
+    const [selectedUser, setSelectedUser] = useState(null); // To hold selected user info
 
     useEffect(() => {
         dispatch(requestFindAllUsers());
-    }, []);
+    }, [dispatch]);
 
     const handleEdit = (user) => {
-        setShowEditModal(true); // Mở modal
+        setShowEditModal(true);
         setSelectedUser({
             id: user.id,
             name: user.name,
@@ -52,8 +54,7 @@ const ManagerUser = () => {
 
     const handleCreate = () => {
         if (userPermissions.includes("create")) {
-            // Xử lý tạo mới
-            alert("created");
+            setShowCreateModal(true); // Open the Create User modal
         } else {
             toast.error("You don't have permission to create");
         }
@@ -109,6 +110,10 @@ const ManagerUser = () => {
                 handleClose={() => setShowEditModal(false)}
                 user={selectedUser}
                 handleUpdate={handleUpdateUser}
+            />
+            <CreateUserModal
+                show={showCreateModal}
+                handleClose={() => setShowCreateModal(false)}
             />
         </div>
     );

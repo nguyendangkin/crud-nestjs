@@ -15,6 +15,7 @@ export const requestFindAllUsers = createAsyncThunk(
             }
             return response.data;
         } catch (error) {
+            console.log(error);
             toast.error(
                 "Cannot connect to the server. Please check your internet connection."
             );
@@ -47,7 +48,7 @@ export const requestDeleteUser = createAsyncThunk(
     "userCRUD/requestDeleteUser",
     async (id) => {
         try {
-            const response = await axios.delete(`/users/${id}`); // Sử dụng DELETE thay vì POST
+            const response = await axios.delete(`/users/${id}`);
 
             if (response.data.statusCode === 200) {
                 toast.success(response.data.message);
@@ -55,7 +56,49 @@ export const requestDeleteUser = createAsyncThunk(
                 toast.error(response.data.message);
             }
 
-            return response.data; // Trả về dữ liệu sau khi xóa thành công
+            return response.data;
+        } catch (error) {
+            toast.error(
+                "Cannot connect to the server. Please check your internet connection."
+            );
+        }
+    }
+);
+
+export const requestGetAllRole = createAsyncThunk(
+    "userCRUD/requestGetAllRole",
+    async (id) => {
+        try {
+            const response = await axios.delete(`/users/${id}`);
+
+            if (response.data.statusCode === 200) {
+                toast.success(response.data.message);
+            } else {
+                toast.error(response.data.message);
+            }
+
+            return response.data;
+        } catch (error) {
+            toast.error(
+                "Cannot connect to the server. Please check your internet connection."
+            );
+        }
+    }
+);
+
+export const requestCreateUser = createAsyncThunk(
+    "userCRUD/requestCreateUser",
+    async (userData) => {
+        try {
+            const response = await axios.post(`/users`, userData);
+
+            if (response.data.statusCode === 200) {
+                toast.success(response.data.message);
+            } else {
+                toast.error(response.data.message);
+            }
+
+            return response.data;
         } catch (error) {
             toast.error(
                 "Cannot connect to the server. Please check your internet connection."

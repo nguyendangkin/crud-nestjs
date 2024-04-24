@@ -12,17 +12,17 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from '../common/user.entity';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard'; // Guard để xác thực JWT
-import { RoleGuard } from '../auth/role.guard'; // Guard để kiểm tra vai trò
+import { JwtAuthGuard } from '../auth/jwt-auth.guard'; // Guard xác thực JWT
+import { RoleGuard } from '../auth/role.guard'; // Guard kiểm tra vai trò
 
-// @UseGuards(JwtAuthGuard) // Bảo vệ toàn bộ Controller bằng JwtAuthGuard
-// @SetMetadata('roles', ['admin']) // Chỉ định vai trò 'admin'
-// @UseGuards(RoleGuard) // Sử dụng RoleGuard để kiểm tra vai trò
+@UseGuards(JwtAuthGuard) // Áp dụng JwtAuthGuard để xác thực JWT
 @Controller('users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   // Read all users
+  @SetMetadata('roles', ['admin', 'editor']) // Chỉ cho phép vai trò 'admin'
+  @UseGuards(JwtAuthGuard, RoleGuard) // Áp dụng JwtAuthGuard và RoleGuard
   @Get()
   async findAll() {
     try {
@@ -44,6 +44,8 @@ export class UsersController {
   @Post()
   async createNewUser(@Body() userData: Partial<User>) {
     try {
+      console.log('checking user', userData);
+
       const result = await this.userService.createUser(userData);
       return {
         statusCode: result.statusCode,
@@ -76,6 +78,9 @@ export class UsersController {
   }
 
   // Update user
+  @SetMetadata('roles', ['admin', 'editor']) // Cho phép các vai trò 'admin' hoặc 'editor'
+  @SetMetadata('permissions', ['edit']) // Yêu cầu quyền 'edit'
+  @UseGuards(JwtAuthGuard, RoleGuard) // Áp dụng JwtAuthGuard và RoleGuard
   @Post()
   async updateUserById(@Body() updateData: Partial<User>) {
     try {

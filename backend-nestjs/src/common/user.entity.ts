@@ -19,8 +19,8 @@ export class User {
   @Column()
   name: string;
 
-  @Column()
-  password: string;
+  @Column({ nullable: true })
+  password: string | null;
 
   @Column({ default: 1 })
   groupId: number;

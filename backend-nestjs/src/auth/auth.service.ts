@@ -16,6 +16,13 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
+  // Reusable function to create `accessToken`
+  private createAccessToken(payload: any): string {
+    return this.jwtService.sign(payload, {
+      expiresIn: this.configService.get<string>('EXPIRESIN_ACCESS_TOKEN'),
+    });
+  }
+
   // Register user
   async registerUser(
     email: string,
@@ -45,6 +52,10 @@ export class AuthService {
       };
     } catch (error) {
       console.log(error);
+      throw new HttpException(
+        'Registration failed',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -70,13 +81,8 @@ export class AuthService {
         permissions: groupRole.role.permissions,
       }));
 
-      console.log('check role', userRole);
-
       const payload = { userId: user.id, email: user.email, role: userRole };
-
-      const accessToken = this.jwtService.sign(payload, {
-        expiresIn: this.configService.get<string>('EXPIRESIN_ACCESS_TOKEN'),
-      });
+      const accessToken = this.createAccessToken(payload); // Using the reusable function
 
       const refreshToken = this.jwtService.sign(
         { userId: user.id },
@@ -95,6 +101,53 @@ export class AuthService {
       };
     } catch (error) {
       console.log(error);
+      throw new HttpException('Login failed', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  // Function to refresh `accessToken` using `refreshToken`
+  async refreshAccessToken(refreshToken: string): Promise<any> {
+    try {
+      const decoded = this.jwtService.verify(refreshToken, {
+        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+      });
+
+      const userId = decoded.userId;
+
+      const user = await this.userRepository.findOne({
+        where: { id: userId },
+        relations: ['group', 'group.groupRoles', 'group.groupRoles.role'],
+      });
+
+      if (!user) {
+        throw new HttpException(
+          'Refresh token is invalid or expired',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+
+      // Reusing the `userRole` structure
+      const userRole = user.group.groupRoles.map((groupRole) => ({
+        name: groupRole.role.role,
+        permissions: groupRole.role.permissions,
+      }));
+
+      const payload = { userId: user.id, email: user.email, role: userRole };
+      const accessToken = this.createAccessToken(payload); // Using reusable function
+
+      return {
+        accessToken,
+        refreshToken,
+        userProfile: {
+          email: user.email,
+          name: user.name,
+        },
+      };
+    } catch (error) {
+      throw new HttpException(
+        'Refresh token is invalid or expired',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
   }
 }

@@ -3,17 +3,37 @@ import { Reflector } from '@nestjs/core';
 
 @Injectable()
 export class RoleGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const roles = this.reflector.get<string[]>('roles', context.getHandler());
-    if (!roles) {
-      return true; // Nếu không yêu cầu vai trò cụ thể
+    const requiredRoles = this.reflector.get<string[]>(
+      'roles',
+      context.getHandler(),
+    );
+    const requiredPermissions = this.reflector.get<string[]>(
+      'permissions',
+      context.getHandler(),
+    ); // Lấy quyền hạn yêu cầu
+
+    if (!requiredRoles && !requiredPermissions) {
+      return true; // Nếu không yêu cầu vai trò hoặc quyền hạn cụ thể
     }
 
     const request = context.switchToHttp().getRequest();
-    const user = request.user; // Lấy người dùng từ JWT
+    const user = request.user;
 
-    return roles.some((role) => user.role.name === role); // Kiểm tra quyền truy cập
+    // Kiểm tra xem người dùng có vai trò cần thiết không
+    const hasRole = requiredRoles
+      ? user.role.some((r) => requiredRoles.includes(r.name))
+      : true;
+
+    // Kiểm tra xem người dùng có quyền hạn cần thiết không
+    const hasPermission = requiredPermissions
+      ? user.role.some((r) =>
+          r.permissions.some((p) => requiredPermissions.includes(p)),
+        )
+      : true;
+
+    return hasRole && hasPermission; // Yêu cầu cả vai trò và quyền hạn
   }
 }
